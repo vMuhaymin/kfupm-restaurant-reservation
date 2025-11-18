@@ -3,10 +3,10 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { Navbar } from "@/components/student/Navbar";
 import { ViewOrders } from "@/components/staff/ViewOrders";
 import { CanceledOrders } from "@/components/staff/CanceledOrders";
-import { MenuManagement } from "@/components/manager/MenuManagement";
-import { DailyReports } from "@/components/manager/DailyReports";
-import { UserManagement } from "@/components/manager/UserManagement";
-import { ArchiveOrders } from "@/components/manager/ArchiveOrders";
+import { MenuManagement } from "@/components/admin/MenuManagement";
+import { DailyReports } from "@/components/admin/DailyReports";
+import { UserManagement } from "@/components/admin/UserManagement";
+import { ArchiveOrders } from "@/components/admin/ArchiveOrders";
 
 interface Order {
   id: string;

@@ -13,7 +13,7 @@ import { MyCart } from "./pages/MyCart";
 import { CurrentOrders } from "./pages/CurrentOrders";
 import { OrderHistory } from "./pages/OrderHistory";
 import { StaffDashboard } from "./pages/StaffDashboard";
-import { ManagerDashboard } from "./pages/ManagerDashboard";
+import { ManagerDashboard as AdminDashboard } from "./pages/AdminDashboard";
 import { NotFound } from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,7 +43,7 @@ const App = () => (
           <Route path="/staff/*" element={<StaffDashboard />} />
           
           {/* Manager Dashboard Routes */}
-          <Route path="/manager/*" element={<ManagerDashboard />} />
+          <Route path="/manager/*" element={<AdminDashboard />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

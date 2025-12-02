@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,9 @@ export function ForgotPassword() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email) {
@@ -17,11 +20,22 @@ export function ForgotPassword() {
       return;
     }
     
-    // Front-end only
-    toast.success("Please check your email for the reset code.");
+    setIsLoading(true);
     
-    
-    navigate("/check-email", { state: { email } });
+    try {
+      const { authAPI } = await import('@/lib/api');
+      const data = await authAPI.requestReset(email);
+      
+      // Show code as alert (as per requirements)
+      alert(`Your reset code is: ${data.code}`);
+      
+      toast.success("Reset code generated. Please check the alert.");
+      navigate("/check-email", { state: { email, code: data.code } });
+    } catch (error: any) {
+      toast.error(error.message || "Failed to request reset code");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -60,9 +74,10 @@ export function ForgotPassword() {
             
             <Button 
               type="submit"
-              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg"
+              disabled={isLoading}
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg disabled:opacity-50"
             >
-              Reset Password
+              {isLoading ? "Requesting..." : "Reset Password"}
             </Button>
           </form>
         </div>

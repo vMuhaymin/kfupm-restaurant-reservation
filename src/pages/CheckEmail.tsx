@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,10 +10,12 @@ import { toast } from "sonner";
 export function CheckEmail() {
   const navigate = useNavigate();
   const location = useLocation();
-  const email = (location.state as { email?: string })?.email || "contact@dscode...com";
-  const [code, setCode] = useState("");
+  const email = (location.state as { email?: string; code?: string })?.email || "";
+  const storedCode = (location.state as { code?: string })?.code;
+  const [code, setCode] = useState(storedCode || "");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (code.length !== 5) {
@@ -20,14 +23,36 @@ export function CheckEmail() {
       return; 
     }
     
-    // Front-end only - accept any 5-digit code
-    toast.success("Redirecting to set new password...");
+    setIsLoading(true);
     
-    navigate("/set-new-password", { state: { email } });
+    try {
+      const { authAPI } = await import('@/lib/api');
+      await authAPI.verifyCode(email, code);
+      
+      toast.success("Code verified successfully!");
+      navigate("/set-new-password", { state: { email, code } });
+    } catch (error: any) {
+      toast.error(error.message || "Invalid or expired code");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleResend = () => {
-    toast.success("A new verification code has been sent to your email.");
+  const handleResend = async () => {
+    if (!email) {
+      toast.error("Email not found");
+      return;
+    }
+    
+    try {
+      const { authAPI } = await import('@/lib/api');
+      const data = await authAPI.requestReset(email);
+      alert(`Your reset code is: ${data.code}`);
+      setCode(data.code);
+      toast.success("New code generated. Please check the alert.");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to resend code");
+    }
   };
 
   return (
@@ -72,9 +97,10 @@ export function CheckEmail() {
             
             <Button 
               type="submit"
-              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg"
+              disabled={isLoading}
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg disabled:opacity-50"
             >
-              Verify Code
+              {isLoading ? "Verifying..." : "Verify Code"}
             </Button>
             
             <div className="text-center text-sm text-muted-foreground">

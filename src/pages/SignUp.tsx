@@ -1,39 +1,64 @@
-
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
-    role: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match. Please try again.");
       return;
     }
-    
-    if (!formData.role) {
-      toast.error("Please select a role.");
+
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters long.");
       return;
     }
     
-    
-    toast.success("Your account has been created successfully!");
-    
-    
-    console.log("Sign up data:", formData);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:55555/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("Your account has been created successfully! Please login.");
+        // Redirect to login page
+        navigate('/login');
+      } else {
+        toast.error(data.message || "Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      toast.error("Failed to create account. Please check your connection and try again.");
+      console.error('Signup error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -102,25 +127,12 @@ const SignUp = () => {
               />
             </div>
             
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">Select your role</label>
-              <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                <SelectTrigger className="h-12 bg-background border-border rounded-lg">
-                  <SelectValue placeholder="Choose role.." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="student">Student</SelectItem>
-                  <SelectItem value="staff">Staff</SelectItem>
-                  <SelectItem value="faculty">Faculty</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
             <Button 
               type="submit"
-              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg mt-6"
+              disabled={isLoading}
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg mt-6 disabled:opacity-50"
             >
-              Create your account
+              {isLoading ? "Creating account..." : "Create your account"}
             </Button>
             
             <p className="text-center text-xs text-muted-foreground mt-4">

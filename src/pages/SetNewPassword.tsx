@@ -8,10 +8,13 @@ import { toast } from "sonner";
 export function SetNewPassword() {
   const navigate = useNavigate();
   const location = useLocation();
+  const email = (location.state as { email?: string })?.email || "";
+  const code = (location.state as { code?: string })?.code || "";
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
@@ -24,11 +27,25 @@ export function SetNewPassword() {
       return;
     }
     
-    // Front-end only - simulate password reset
-    toast.success("Your password has been successfully updated!");
+    if (!email || !code) {
+      toast.error("Missing email or code. Please start over.");
+      navigate("/forgot-password");
+      return;
+    }
     
-    // Navigate back to login
-    navigate("/login");
+    setIsLoading(true);
+    
+    try {
+      const { authAPI } = await import('@/lib/api');
+      await authAPI.changePassword(email, code, password);
+      
+      toast.success("Your password has been successfully updated!");
+      navigate("/login");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update password");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -79,9 +96,10 @@ export function SetNewPassword() {
             
             <Button 
               type="submit"
-              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg"
+              disabled={isLoading}
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg disabled:opacity-50"
             >
-              Update Password
+              {isLoading ? "Updating..." : "Update Password"}
             </Button>
           </form>
         </div>

@@ -48,7 +48,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Middleware
-// CORS configuration - allow all origins for development
+// CORS configuration, allow all origins for development
 app.use(cors({ 
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

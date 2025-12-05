@@ -1,4 +1,3 @@
-
 const API_BASE_URL = 'http://localhost:55555/api';
 
 // Get auth token from localStorage
@@ -63,10 +62,7 @@ export const authAPI = {
   changePassword: (email: string, code: string, newPassword: string) =>
     apiRequest('/auth/change-password', { method: 'POST', body: JSON.stringify({ email, code, newPassword }) }),
 };
-
-
-// Added: uploadImage() method for file uploads using FormData
-
+// Menu API
 export const menuAPI = {
   getMenu: () => apiRequest('/menu'),
   getMenuItem: (id: string) => apiRequest(`/menu/${id}`),
@@ -93,7 +89,7 @@ export const menuAPI = {
   },
 };
 
-
+// Order API
 export const orderAPI = {
   createOrder: (data: { items: any[]; pickupTime: string; specialInstructions?: string }) =>
     apiRequest('/orders', { method: 'POST', body: JSON.stringify(data) }),
@@ -122,7 +118,7 @@ export const staffAPI = {
   cancelOrder: (id: string) => apiRequest(`/staff/orders/${id}/cancel`, { method: 'PATCH' }),
 };
 
-
+// Manager API
 export const managerAPI = {
   getUsers: () => apiRequest('/manager/users'),
   
@@ -160,4 +156,3 @@ export const managerAPI = {
   
   cancelOrder: (id: string) => apiRequest(`/staff/orders/${id}/cancel`, { method: 'PATCH' }),
 };
-

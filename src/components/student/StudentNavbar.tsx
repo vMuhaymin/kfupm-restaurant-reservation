@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 interface StudentNavbarProps {
   cartCount?: number;
@@ -13,7 +13,6 @@ export function StudentNavbar({ cartCount = 0 }: StudentNavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems = [
-    { path: '/student/home', label: 'Home' },
     { path: '/student/menu', label: 'Browse Menu' },
     { path: '/student/current-orders', label: 'Current Orders' },
     { path: '/student/order-history', label: 'Order History' },
@@ -59,18 +58,6 @@ export function StudentNavbar({ cartCount = 0 }: StudentNavbarProps) {
 
           {/* Desktop Right Section */}
           <div className="hidden md:flex items-center gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/student/cart')}
-              className="relative"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </Button>
             <Button 
               variant="outline" 
               onClick={handleLogout}
@@ -82,18 +69,6 @@ export function StudentNavbar({ cartCount = 0 }: StudentNavbarProps) {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center gap-2">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/student/cart')}
-              className="relative"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </Button>
             <Button
               variant="ghost"
               size="icon"

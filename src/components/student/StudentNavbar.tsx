@@ -25,6 +25,9 @@ export function StudentNavbar({ cartCount = 0 }: StudentNavbarProps) {
 
   const handleLogout = () => {
     setIsMenuOpen(false);
+    // Clear authentication data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     navigate('/');
   };
 

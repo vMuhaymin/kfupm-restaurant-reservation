@@ -49,7 +49,7 @@ const SignUp = () => {
       if (response.ok) {
         toast.success("Your account has been created successfully! Please login.");
         // Redirect to login page
-        navigate('/login');
+        navigate('/auth/login');
       } else {
         toast.error(data.message || "Something went wrong. Please try again.");
       }
@@ -149,7 +149,7 @@ const SignUp = () => {
           
           <div className="mt-4 text-center">
             <span className="text-muted-foreground text-sm">Do you have an account? </span>
-            <Link to="/login" className="text-accent hover:underline text-sm font-medium">
+            <Link to="/auth/login" className="text-accent hover:underline text-sm font-medium">
               Log In
             </Link>
           </div>

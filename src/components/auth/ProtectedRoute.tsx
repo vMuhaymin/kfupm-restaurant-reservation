@@ -82,7 +82,7 @@ export function ProtectedRoute({ children, allowedRoles = [] }: ProtectedRoutePr
   // Redirect to login if not authorized
   if (!isAuthorized) {
     // Store the attempted location so we can redirect back after login
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
   // User is authorized, render the protected content

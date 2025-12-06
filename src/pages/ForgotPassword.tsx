@@ -30,7 +30,7 @@ export function ForgotPassword() {
       alert(`Your reset code is: ${data.code}`);
       
       toast.success("Reset code generated. Please check the alert.");
-      navigate("/check-email", { state: { email, code: data.code } });
+      navigate("/auth/check-email", { state: { email, code: data.code } });
     } catch (error: any) {
       toast.error(error.message || "Failed to request reset code");
     } finally {
@@ -47,7 +47,7 @@ export function ForgotPassword() {
       <div className="flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md">
           <Link 
-            to="/login" 
+            to="/auth/login" 
             className="inline-flex items-center text-accent hover:underline mb-6"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />

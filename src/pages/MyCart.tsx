@@ -552,7 +552,7 @@ export function MyCart() {
     const user = getUser();
     if (!user) {
       toast.error("Please login to place an order");
-      navigate('/login');
+      navigate('/auth/login');
       return;
     }
 

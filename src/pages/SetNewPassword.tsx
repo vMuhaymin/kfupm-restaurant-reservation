@@ -40,7 +40,7 @@ export function SetNewPassword() {
       await authAPI.changePassword(email, code, password);
       
       toast.success("Your password has been successfully updated!");
-      navigate("/login");
+      navigate("/auth/login");
     } catch (error: any) {
       toast.error(error.message || "Failed to update password");
     } finally {
@@ -57,7 +57,7 @@ export function SetNewPassword() {
       <div className="flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md">
           <Link 
-            to="/check-email" 
+            to="/auth/check-email" 
             className="inline-flex items-center text-accent hover:underline mb-6"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />

@@ -76,7 +76,7 @@ export function CurrentOrders() {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           setTimeout(() => {
-            window.location.href = '/login';
+            window.location.href = '/auth/login';
           }, 1000);
         } else {
           // Only show error on first fetch attempt

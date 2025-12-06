@@ -30,7 +30,7 @@ export function CheckEmail() {
       await authAPI.verifyCode(email, code);
       
       toast.success("Code verified successfully!");
-      navigate("/set-new-password", { state: { email, code } });
+      navigate("/auth/set-new-password", { state: { email, code } });
     } catch (error: any) {
       toast.error(error.message || "Invalid or expired code");
     } finally {
@@ -64,7 +64,7 @@ export function CheckEmail() {
       <div className="flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md">
           <Link 
-            to="/forgot-password" 
+            to="/auth/forgot-password" 
             className="inline-flex items-center text-accent hover:underline mb-6"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />

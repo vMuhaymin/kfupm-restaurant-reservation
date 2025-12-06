@@ -35,6 +35,9 @@ export function Navbar({ userRole, currentPath }: NavbarProps) {
 
   const handleLogout = () => {
     setIsMenuOpen(false);
+    // Clear authentication data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     navigate('/');
   };
 

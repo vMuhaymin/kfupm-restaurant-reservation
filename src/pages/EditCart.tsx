@@ -224,7 +224,7 @@ export function EditCart() {
     const user = getUser();
     if (!user) {
       toast.error("Please login to update an order");
-      navigate('/login');
+      navigate('/auth/login');
       return;
     }
 

@@ -4,67 +4,128 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search } from "lucide-react";
+import { Search, X, Info } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ImageWithFallback } from "@/components/common/ImageWithFallback";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Order {
-  id: string;
-  studentName: string;
-  items: string[];
+  _id: string;
+  orderId: string;
+  userId: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  items: { name: string; quantity: number; price: number }[];
   pickupTime: string;
-  status: 'Pending' | 'Preparing' | 'Ready' | 'Completed';
-  imageUrl?: string;
+  specialInstructions?: string;
+  status: 'pending' | 'preparing' | 'ready' | 'picked' | 'cancelled';
+  createdAt: string;
 }
 
 interface ViewOrdersProps {
   orders: Order[];
-  onUpdateStatus: (orderId: string, newStatus: Order['status']) => void;
+  onUpdateStatus: (orderId: string, newStatus: 'pending' | 'preparing' | 'ready' | 'picked') => void;
   onConfirmPickup: (orderId: string) => void;
+  onCancelOrder?: (orderId: string) => void;
 }
 
-export function ViewOrders({ orders, onUpdateStatus, onConfirmPickup }: ViewOrdersProps) {
+export function ViewOrders({ orders, onUpdateStatus, onConfirmPickup, onCancelOrder }: ViewOrdersProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
-  const activeOrders = orders.filter(order => order.status !== 'Completed');
-  
-  const filteredOrders = activeOrders.filter(order => 
-    order.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.id.toLowerCase().includes(searchTerm.toLowerCase())
+  const activeOrders = orders.filter(order => 
+    order.status !== 'picked' && order.status !== 'cancelled'
   );
+  
+  const filteredOrders = activeOrders.filter(order => {
+    const studentName = `${order.userId.firstName} ${order.userId.lastName}`;
+    return (
+      studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.orderId.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
 
   const handleStatusUpdate = (orderId: string, currentStatus: Order['status']) => {
-    let newStatus: Order['status'];
+    let newStatus: 'pending' | 'preparing' | 'ready' | 'picked';
     
-    if (currentStatus === 'Pending') {
-      newStatus = 'Preparing';
-    } else if (currentStatus === 'Preparing') {
-      newStatus = 'Ready';
+    if (currentStatus === 'pending') {
+      newStatus = 'preparing';
+    } else if (currentStatus === 'preparing') {
+      newStatus = 'ready';
     } else {
       return;
     }
     
     onUpdateStatus(orderId, newStatus);
-    toast.success('Order status updated successfully');
   };
 
   const handleConfirmPickup = (orderId: string, status: Order['status']) => {
-    if (status !== 'Ready') {
+    if (status !== 'ready') {
       toast.error('Order must be Ready before confirming pickup');
       return;
     }
     onConfirmPickup(orderId);
-    toast.success('Pickup confirmed - Order completed');
+  };
+
+  const handleCancelClick = (orderId: string) => {
+    setOrderToCancel(orderId);
+    setShowCancelDialog(true);
+  };
+
+  const handleCancelConfirm = async () => {
+    if (orderToCancel && onCancelOrder) {
+      await onCancelOrder(orderToCancel);
+      setShowCancelDialog(false);
+      setOrderToCancel(null);
+    }
   };
 
   const getStatusColor = (status: Order['status']) => {
     switch (status) {
-      case 'Pending': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-      case 'Preparing': return 'bg-blue-100 text-blue-800 border-blue-300';
-      case 'Ready': return 'bg-green-100 text-green-800 border-green-300';
-      case 'Completed': return 'bg-gray-100 text-gray-800 border-gray-300';
+      case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'preparing': return 'bg-blue-100 text-blue-800 border-blue-300';
+      case 'ready': return 'bg-green-100 text-green-800 border-green-300';
+      case 'picked': return 'bg-gray-100 text-gray-800 border-gray-300';
+      default: return 'bg-gray-100 text-gray-800 border-gray-300';
     }
+  };
+
+  const getStatusDisplay = (status: Order['status']) => {
+    switch (status) {
+      case 'pending': return 'Pending';
+      case 'preparing': return 'Preparing';
+      case 'ready': return 'Ready';
+      case 'picked': return 'Completed';
+      default: return status;
+    }
+  };
+
+  // Get image from first item (use same imagePath as student view)
+  const getOrderImage = (order: Order) => {
+    if (order.items && order.items.length > 0) {
+      // This will be handled by matching menu items - for now return null
+      return null;
+    }
+    return null;
   };
 
   return (
@@ -99,61 +160,114 @@ export function ViewOrders({ orders, onUpdateStatus, onConfirmPickup }: ViewOrde
                     <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Student</TableHead>
                     <TableHead className="text-xs sm:text-sm">Items</TableHead>
                     <TableHead className="text-xs sm:text-sm hidden md:table-cell">Time</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">Instructions</TableHead>
                     <TableHead className="text-xs sm:text-sm">Status</TableHead>
                     <TableHead className="text-xs sm:text-sm">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredOrders.map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell className="p-2 sm:p-4">
-                        {order.imageUrl && (
-                          <ImageWithFallback
-                            src={order.imageUrl}
-                            alt={order.items[0]}
-                            className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded"
-                          />
-                        )}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm font-semibold">{order.id}</TableCell>
-                      <TableCell className="text-xs sm:text-sm hidden sm:table-cell truncate">{order.studentName}</TableCell>
-                      <TableCell className="text-xs sm:text-sm truncate">{order.items.join(', ')}</TableCell>
-                      <TableCell className="text-xs sm:text-sm hidden md:table-cell">{order.pickupTime}</TableCell>
-                      <TableCell className="text-xs sm:text-sm">
-                        <Badge variant="outline" className={`${getStatusColor(order.status)} text-xs`}>
-                          {order.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="p-2 sm:p-4">
-                        <div className="flex gap-1 flex-col sm:flex-row">
-                          {(order.status === 'Pending' || order.status === 'Preparing') && (
-                            <Button
-                              size="sm"
-                              onClick={() => handleStatusUpdate(order.id, order.status)}
-                              className="bg-blue-600 hover:bg-blue-700 text-xs h-8"
-                            >
-                              {order.status === 'Pending' ? 'Prepare' : 'Ready'}
-                            </Button>
+                  {filteredOrders.map((order) => {
+                    const studentName = `${order.userId.firstName} ${order.userId.lastName}`;
+                    const itemsList = order.items.map(item => `${item.quantity}x ${item.name}`).join(', ');
+                    return (
+                      <TableRow key={order._id}>
+                        <TableCell className="p-2 sm:p-4">
+                          {order.items[0] && (
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded flex items-center justify-center">
+                              <span className="text-xs text-gray-500">📦</span>
+                            </div>
                           )}
-                          {order.status === 'Ready' && (
-                            <Button
-                              size="sm"
-                              onClick={() => handleConfirmPickup(order.id, order.status)}
-                              className="bg-green-600 hover:bg-green-700 text-xs h-8"
-                            >
-                              Pickup
-                            </Button>
+                        </TableCell>
+                        <TableCell className="text-xs sm:text-sm font-semibold">{order.orderId}</TableCell>
+                        <TableCell className="text-xs sm:text-sm hidden sm:table-cell truncate">{studentName}</TableCell>
+                        <TableCell className="text-xs sm:text-sm truncate">{itemsList}</TableCell>
+                        <TableCell className="text-xs sm:text-sm hidden md:table-cell">{order.pickupTime}</TableCell>
+                        <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
+                          {order.specialInstructions ? (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="flex items-center gap-1 cursor-help">
+                                    <Info className="w-4 h-4 text-blue-500" />
+                                    <span className="truncate max-w-[100px]">{order.specialInstructions}</span>
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-xs">
+                                  <p>{order.specialInstructions}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          ) : (
+                            <span className="text-gray-400">-</span>
                           )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                        <TableCell className="text-xs sm:text-sm">
+                          <Badge variant="outline" className={`${getStatusColor(order.status)} text-xs`}>
+                            {getStatusDisplay(order.status)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="p-2 sm:p-4">
+                          <div className="flex gap-1 flex-col sm:flex-row">
+                            {(order.status === 'pending' || order.status === 'preparing') && (
+                              <Button
+                                size="sm"
+                                onClick={() => handleStatusUpdate(order._id, order.status)}
+                                className="bg-blue-600 hover:bg-blue-700 text-xs h-8"
+                              >
+                                {order.status === 'pending' ? 'Prepare' : 'Ready'}
+                              </Button>
+                            )}
+                            {order.status === 'ready' && (
+                              <Button
+                                size="sm"
+                                onClick={() => handleConfirmPickup(order._id, order.status)}
+                                className="bg-green-600 hover:bg-green-700 text-xs h-8"
+                              >
+                                Pickup
+                              </Button>
+                            )}
+                            {(order.status === 'pending' || order.status === 'preparing' || order.status === 'ready') && onCancelOrder && (
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleCancelClick(order._id)}
+                                className="text-xs h-8"
+                              >
+                                <X className="w-3 h-3 mr-1" />
+                                Cancel
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel Order</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to cancel this order? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep Order</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancelConfirm}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Yes, Cancel Order
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

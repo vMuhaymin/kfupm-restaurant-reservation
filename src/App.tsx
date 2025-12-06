@@ -10,11 +10,13 @@ import { SetNewPassword } from "./pages/SetNewPassword";
 import { Home } from "./pages/Home";
 import { BrowseMenu } from "./pages/BrowseMenu";
 import { MyCart } from "./pages/MyCart";
+import { EditCart } from "./pages/EditCart";
 import { CurrentOrders } from "./pages/CurrentOrders";
 import { OrderHistory } from "./pages/OrderHistory";
 import { StaffDashboard } from "./pages/StaffDashboard";
 import { ManagerDashboard as AdminDashboard } from "./pages/AdminDashboard";
 import { NotFound } from "./pages/NotFound";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -24,26 +26,85 @@ const App = () => (
       <Toaster />
       <BrowserRouter>
         <Routes>
+          {/* Public Landing Page */}
+          <Route path="/" element={<Home />} />
+          
           {/* Authentication Routes */}
-          <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/check-email" element={<CheckEmail />} />
-          <Route path="/set-new-password" element={<SetNewPassword />} />
+          <Route path="/auth/login" element={<Login />} />
+          <Route path="/auth/signup" element={<SignUp />} />
+          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+          <Route path="/auth/check-email" element={<CheckEmail />} />
+          <Route path="/auth/set-new-password" element={<SetNewPassword />} />
           
           {/* Student Dashboard Routes */}
-          <Route path="/student/home" element={<Home />} />
-          <Route path="/student/menu" element={<BrowseMenu />} />
-          <Route path="/student/cart" element={<MyCart />} />
-          <Route path="/student/current-orders" element={<CurrentOrders />} />
-          <Route path="/student/order-history" element={<OrderHistory />} />
+          <Route 
+            path="/student/home" 
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <Home />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/student/menu" 
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <BrowseMenu />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/student/cart" 
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <MyCart />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/student/edit-cart" 
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <EditCart />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/student/current-orders" 
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <CurrentOrders />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/student/order-history" 
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <OrderHistory />
+              </ProtectedRoute>
+            } 
+          />
           
           {/* Staff Dashboard Routes */}
-          <Route path="/staff/*" element={<StaffDashboard />} />
+          <Route 
+            path="/staff/*" 
+            element={
+              <ProtectedRoute allowedRoles={['staff', 'manager']}>
+                <StaffDashboard />
+              </ProtectedRoute>
+            } 
+          />
           
           {/* Manager Dashboard Routes */}
-          <Route path="/manager/*" element={<AdminDashboard />} />
+          <Route 
+            path="/manager/*" 
+            element={
+              <ProtectedRoute allowedRoles={['manager']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

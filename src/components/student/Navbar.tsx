@@ -68,7 +68,7 @@ export function Navbar({ userRole, currentPath }: NavbarProps) {
 
           {/* Desktop Right Section */}
           <div className="hidden md:flex items-center gap-4">
-            <span className="text-muted-foreground text-sm">Role: <span className="font-semibold text-foreground">{userRole === 'manager' ? 'Manager' : 'Staff'}</span></span>
+            <span className="text-muted-foreground text-sm">Role: <span className="font-semibold text-foreground">{userRole === 'manager' ? 'Admin' : 'Staff'}</span></span>
             <Button 
               variant="outline" 
               onClick={handleLogout}
@@ -106,7 +106,7 @@ export function Navbar({ userRole, currentPath }: NavbarProps) {
                 </Button>
               ))}
               <div className="px-2 py-2 text-sm text-muted-foreground">
-                Role: <span className="font-semibold text-foreground">{userRole === 'manager' ? 'Manager' : 'Staff'}</span>
+                Role: <span className="font-semibold text-foreground">{userRole === 'manager' ? 'Admin' : 'Staff'}</span>
               </div>
               <Button 
                 variant="outline" 

@@ -95,7 +95,7 @@ export function DailyReports({ orders }: DailyReportsProps) {
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Total Revenue</p>
-                        <p className="text-2xl">${totalRevenue.toFixed(2)}</p>
+                        <p className="text-2xl">{totalRevenue.toFixed(2)} SAR</p>
                       </div>
                     </div>
                   </CardContent>
@@ -140,12 +140,12 @@ export function DailyReports({ orders }: DailyReportsProps) {
                     </div>
                     <div className="flex justify-between border-t pt-2 mt-2">
                       <span className="text-gray-600">Total Revenue:</span>
-                      <span className="text-blue-600">${totalRevenue.toFixed(2)}</span>
+                      <span className="text-blue-600">{totalRevenue.toFixed(2)} SAR</span>
                     </div>
                     {totalOrders > 0 && (
                       <div className="flex justify-between">
                         <span className="text-gray-600">Average Order Value:</span>
-                        <span>${(totalRevenue / totalOrders).toFixed(2)}</span>
+                        <span>{(totalRevenue / totalOrders).toFixed(2)} SAR</span>
                       </div>
                     )}
                   </div>

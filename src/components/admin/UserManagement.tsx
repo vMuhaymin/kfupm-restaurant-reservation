@@ -5,6 +5,16 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Pencil, Plus, Trash2 } from "lucide-react";
@@ -28,6 +38,8 @@ export function UserManagement({ users, onAddUser, onEditUser, onDeleteUser }: U
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<{ id: string; username: string } | null>(null);
   
   const [formData, setFormData] = useState({
     username: '',
@@ -63,10 +75,16 @@ export function UserManagement({ users, onAddUser, onEditUser, onDeleteUser }: U
       return;
     }
 
-    onEditUser(editingUser.id, {
+    const updates: any = {
       username: formData.username,
       role: formData.role,
-    });
+    };
+    
+    if (formData.password) {
+      updates.password = formData.password;
+    }
+    
+    onEditUser(editingUser.id, updates);
 
     setEditingUser(null);
     setFormData({ username: '', password: '', role: 'staff' });
@@ -84,10 +102,17 @@ export function UserManagement({ users, onAddUser, onEditUser, onDeleteUser }: U
     setIsEditDialogOpen(true);
   };
 
-  const handleDelete = (userId: string, username: string) => {
-    if (confirm(`Are you sure you want to delete user "${username}"?`)) {
-      onDeleteUser(userId);
-      toast.success('User account updated successfully');
+  const handleDeleteClick = (userId: string, username: string) => {
+    setUserToDelete({ id: userId, username });
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (userToDelete) {
+      onDeleteUser(userToDelete.id);
+      toast.success('User deleted successfully');
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
     }
   };
 
@@ -150,18 +175,23 @@ export function UserManagement({ users, onAddUser, onEditUser, onDeleteUser }: U
           </div>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto -mx-3 sm:mx-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-xs sm:text-sm">Username</TableHead>
-                  <TableHead className="text-xs sm:text-sm">Role</TableHead>
-                  <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Created</TableHead>
-                  <TableHead className="text-xs sm:text-sm">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((user) => (
+          {users.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground text-sm sm:text-base">No users found. Click "Add User" to create a new user.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto -mx-3 sm:mx-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs sm:text-sm">Username</TableHead>
+                    <TableHead className="text-xs sm:text-sm">Role</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Created</TableHead>
+                    <TableHead className="text-xs sm:text-sm">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {users.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell className="text-xs sm:text-sm font-semibold truncate">{user.username}</TableCell>
                     <TableCell className="text-xs sm:text-sm">
@@ -189,7 +219,7 @@ export function UserManagement({ users, onAddUser, onEditUser, onDeleteUser }: U
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleDelete(user.id, user.username)}
+                          onClick={() => handleDeleteClick(user.id, user.username)}
                           className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 text-xs"
                         >
                           <Trash2 className="w-3 h-3" />
@@ -197,10 +227,11 @@ export function UserManagement({ users, onAddUser, onEditUser, onDeleteUser }: U
                       </div>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -232,12 +263,43 @@ export function UserManagement({ users, onAddUser, onEditUser, onDeleteUser }: U
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-password">New Password (leave empty to keep current)</Label>
+              <Input
+                id="edit-password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="Enter new password"
+              />
+            </div>
             <Button onClick={handleEditUser} className="w-full bg-blue-600 hover:bg-blue-700">
               Save Changes
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete User</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete user <strong>"{userToDelete?.username}"</strong>? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setUserToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

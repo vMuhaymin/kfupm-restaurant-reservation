@@ -1,12 +1,21 @@
-import { StudentNavbar } from "@/components/student/StudentNavbar";
+import { LandingNavbar } from "@/components/common/LandingNavbar";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import chefHero from "@/assets/chef-hero.jpg";
 
 export function Home() {
+  const navigate = useNavigate();
+
+  const scrollToAboutUs = () => {
+    const aboutUsSection = document.getElementById('about-us');
+    if (aboutUsSection) {
+      aboutUsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <StudentNavbar cartCount={2} />
+      <LandingNavbar />
       
       {/* Hero Section */}
       <section className="relative h-[80vh] sm:h-[100vh] bg-black">
@@ -24,12 +33,17 @@ export function Home() {
               KFUPM RESTAURANT
             </h1>
             <div className="flex gap-3 sm:gap-4 flex-col sm:flex-row">
-              <Link to="/student/menu" className="w-full sm:w-auto">
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 sm:px-8 w-full sm:w-auto">
-                  MENU
-                </Button>
-              </Link>
-              <Button variant="outline" className="bg-transparent text-primary-foreground border-primary-foreground hover:bg-primary-foreground hover:text-primary px-6 sm:px-8 w-full sm:w-auto">
+              <Button 
+                onClick={() => navigate("/auth/login")}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 sm:px-8 w-full sm:w-auto"
+              >
+                GET STARTED
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={scrollToAboutUs}
+                className="bg-transparent text-primary-foreground border-primary-foreground hover:bg-primary-foreground hover:text-primary px-6 sm:px-8 w-full sm:w-auto"
+              >
                 ABOUT US
               </Button>
             </div>
@@ -38,7 +52,7 @@ export function Home() {
       </section>
 
       {/* Info Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-8 py-12 sm:py-16">
+      <section id="about-us" className="max-w-7xl mx-auto px-4 sm:px-8 py-12 sm:py-16">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-display mb-8 sm:mb-12">Know more about us!</h2>
         
         <div className="bg-primary rounded-3xl p-6 sm:p-12">

@@ -29,7 +29,7 @@ export function MenuCard({ name, description, price, image, soldOut, onAddToCart
         <h3 className="font-semibold text-card-foreground mb-1 text-sm sm:text-base line-clamp-2">{name}</h3>
         <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4 line-clamp-2 flex-grow">{description}</p>
         <div className="flex items-center justify-between mt-auto">
-          <span className="font-semibold text-card-foreground text-sm sm:text-base">${price.toFixed(2)}</span>
+          <span className="font-semibold text-card-foreground text-sm sm:text-base">{price.toFixed(2)} SAR</span>
           <Button
             size="icon"
             variant="outline"

@@ -148,7 +148,7 @@ export function BrowseMenu() {
       name: item.name,
       description: item.description,
       price: item.price,
-      image: `http://localhost:55555/uploads${item.imagePath}`,
+      image: `https://kfupm-restaurant-reservation.onrender.com/uploads${item.imagePath}`,
       soldOut: !item.isAvailable,
     });
     return acc;
@@ -169,7 +169,7 @@ export function BrowseMenu() {
         name: item.name,
         description: item.description,
         price: item.price,
-        image: `http://localhost:55555/uploads${item.imagePath}`,
+        image: `https://kfupm-restaurant-reservation.onrender.com/uploads${item.imagePath}`,
         quantity: 1,
       });
     }

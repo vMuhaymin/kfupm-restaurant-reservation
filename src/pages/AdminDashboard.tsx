@@ -274,8 +274,8 @@ export function ManagerDashboard() {
     try {
       // Extract imagePath from imageUrl (remove the base URL if present)
       let imagePath = item.imageUrl;
-      if (imagePath.startsWith('http://localhost:55555/uploads')) {
-        imagePath = imagePath.replace('http://localhost:55555/uploads', '');
+      if (imagePath.startsWith('https://kfupm-restaurant-reservation.onrender.com/uploads')) {
+        imagePath = imagePath.replace('https://kfupm-restaurant-reservation.onrender.com/uploads', '');
       } else if (imagePath.startsWith('/uploads')) {
         imagePath = imagePath.replace('/uploads', '');
       } else if (!imagePath.startsWith('/')) {
@@ -315,8 +315,8 @@ export function ManagerDashboard() {
       
       if (updates.imageUrl !== undefined) {
         let imagePath = updates.imageUrl;
-        if (imagePath.startsWith('http://localhost:55555/uploads')) {
-          imagePath = imagePath.replace('http://localhost:55555/uploads', '');
+        if (imagePath.startsWith('https://kfupm-restaurant-reservation.onrender.com/uploads')) {
+          imagePath = imagePath.replace('https://kfupm-restaurant-reservation.onrender.com/uploads', '');
         } else if (imagePath.startsWith('/uploads')) {
           imagePath = imagePath.replace('/uploads', '');
         }
@@ -422,7 +422,7 @@ export function ManagerDashboard() {
       category: item.category,
       description: item.description || '',
       available: item.isAvailable,
-      imageUrl: `http://localhost:55555/uploads${item.imagePath}`
+      imageUrl: `https://kfupm-restaurant-reservation.onrender.com/uploads${item.imagePath}`
     }));
   };
 

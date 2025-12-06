@@ -105,7 +105,7 @@ export function MenuManagement({ menuItems, onAddItem, onEditItem, onDeleteItem 
         category: formData.category,
         description: formData.description,
         available: true,
-        imageUrl: `http://localhost:55555/uploads${imagePath}`,
+        imageUrl: `https://kfupm-restaurant-reservation.onrender.com/uploads${imagePath}`,
       });
 
       setFormData({ name: '', price: '', category: 'Main Course', description: '', image: null, imagePreview: null });
@@ -143,7 +143,7 @@ export function MenuManagement({ menuItems, onAddItem, onEditItem, onDeleteItem 
         toast.loading('Uploading image...');
         const uploadResult = await menuAPI.uploadImage(formData.image);
         const imagePath = uploadResult.imagePath;
-        updates.imageUrl = `http://localhost:55555/uploads${imagePath}`;
+        updates.imageUrl = `https://kfupm-restaurant-reservation.onrender.com/uploads${imagePath}`;
         toast.dismiss();
       } catch (error: any) {
         toast.dismiss();

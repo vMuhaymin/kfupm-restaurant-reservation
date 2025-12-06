@@ -121,7 +121,7 @@ export function Login() {
       
       // Check if it's a network/connection error
       if (errorMessage.includes('fetch') || errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError') || errorMessage.includes('Cannot connect')) {
-        toast.error("Cannot connect to server. Please make sure the backend is running on http://localhost:55555");
+        toast.error("Cannot connect to server. Please make sure the backend is running on https://kfupm-restaurant-reservation.onrender.com");
       } else {
         toast.error(errorMessage);
       }

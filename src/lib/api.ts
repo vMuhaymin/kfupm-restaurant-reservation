@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:55555/api';
+const API_BASE_URL = 'https://kfupm-restaurant-reservation.onrender.com/api';
 
 // Get auth token from localStorage
 const getToken = () => {

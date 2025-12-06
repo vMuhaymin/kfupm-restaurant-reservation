@@ -91,11 +91,17 @@ app.use((req, res) => {
 // Changed from default 5000 to 55555 to avoid port conflicts
 // Changed host from 0.0.0.0 to localhost to ensure frontend can connect
 // ###################### PORT CONFIGURATION CHANGED ######################
-const PORT = process.env.PORT || 55555;
-const HOST = process.env.HOST || 'localhost';
+// const PORT = process.env.PORT || 55555;
+// const HOST = process.env.HOST || 'localhost' ;
 
-app.listen(PORT, HOST, () => {
-  console.log(`Server running on http://${HOST}:${PORT}`);
+// app.listen(PORT, HOST, () => {
+//   console.log(`Server running on http://${HOST}:${PORT}`);
+//   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+// });
+
+const PORT = process.env.PORT || 55555;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
-
